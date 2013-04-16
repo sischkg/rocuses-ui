@@ -1,0 +1,15 @@
+<html>
+<head></head>
+<body>
+  <table>
+    <% @graph_templates_of.each { |nodename, graph_template_of| -%>
+    <%     graph_template_of.each { |id,graph_template| -%>
+    <tr>
+      <td> <%= nodename -%>_<%= id -%> </td><td> <img src="/image/<%= nodename -%>/<%= id -%>"></td>
+    </tr>
+    <%     } -%>
+    <% } -%>
+  </table>
+</body>
+</html>
+
