@@ -1,4 +1,4 @@
 # coding: utf-8
 
-require './lib/rocuses/ui'
+require 'rocuses/ui'
 run Rocuses::UI

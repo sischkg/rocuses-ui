@@ -5,21 +5,16 @@ require 'rocuses/manager'
 
 module Rocuses
   class UI < Sinatra::Base
-
-#    set :views, File.dirname(__FILE__) + '/../../views'
+    
+    #    set :views, File.dirname(__FILE__) + '/../../views'
     set :views, '/usr/share/rocuses-ui/views'
 
     get '/' do
-      result = "Rocuses UI\n"
+      @result = "Rocuses UI\n"
       manager = load_manager()
-      manager.load_graph_templates()
 
-      @graph_templates_of = Hash.new { |hash, key|
-        hash[key] = Hash.new
-      }
-      graph_template = manager.graph_template_manager.each { |graph_template|
-        @graph_templates_of[graph_template.nodenames.join( %q{,} )][graph_template.name] = graph_template
-      }
+      @graph_template_of = manager.each
+
       erb :index, :trim => '-'
     end
 
@@ -42,7 +37,9 @@ module Rocuses
     private
 
     def load_manager
-      return Rocuses::Manager.new
+      manager = Rocuses::Manager.new
+      manager.load_graph_templates()
+      return manager.graph_template_manager()
     end
 
     def display_graph_image( params )
@@ -51,14 +48,7 @@ module Rocuses
 
       begin 
         manager = load_manager()
-        manager.load_graph_templates()
-
-        graph_template_of = Hash.new
-        manager.graph_template_manager.each { |graph_template|
-          graph_template_of[graph_template.name] = graph_template
-        }
-
-        graph_template = graph_template_of[graph_name]
+        graph_template = manager.get_graph_template( graph_name )
         if graph_template.nil?
           content_type 'text/plain'
           return "Not Found #{ graph_name }"
@@ -108,41 +98,23 @@ module Rocuses
 
     def list_nodes
       manager = load_manager()
-      manager.load_graph_templates()
-
-      graph_templates_of = Hash.new { |hash,nodenames|
-        hash[nodenames] = Array.new
-      }
-      manager.graph_template_manager.each { |graph_template|
-        graph_templates_of[graph_template.nodenames.join( %{,} )] << graph_template
-      }
-      @nodes = graph_templates_of.keys
+      @nodes = manager.list_nodes()
       erb :nodes, :trim => '-'
     end
 
     def list_graphs_of_node( node )
       manager = load_manager()
-      manager.load_graph_templates()
 
-      graph_templates_of = Hash.new { |hash,nodenames|
-        hash[nodenames] = Array.new
-      }
-      manager.graph_template_manager.each { |graph_template|
-        graph_templates_of[graph_template.nodenames.join( %{,} )] << graph_template
-      }
       @name = node
-      @graphs = Array.new
-      graph_templates_of[node].each { |graph_template|
-        graph = {
+      @graphs = manager.find_graph_template_by_nodename( node ).map { |graph_template|
+        {
           :name => graph_template.name,
-          :path => sprintf( '/image/%s', node, graph_template.name ),
+          :path => sprintf( "/image/%s", graph_template.name ),
         }
-        @graphs << graph
       }
       erb :node, :trim => '-'      
     end
 
-#    run!
   end
 end
 
