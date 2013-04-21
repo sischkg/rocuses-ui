@@ -1,0 +1,8 @@
+<rocuses>
+  <node name="<%= @name -%>">
+    <% @graphs.each { |graph| %>
+      <graph name="<%= graph[:name] -%>" path="<%= graph[:path] -%>" /> 
+    <% } %>
+  </node>
+</rocuses>
+
