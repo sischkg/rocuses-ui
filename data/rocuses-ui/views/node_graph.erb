@@ -1,0 +1,11 @@
+<html>
+<head>
+  <title><%= @result -%></title>
+</head>
+<body>
+    <% @graph_templates.each { |graph_template| -%>
+	  <img src="<%= graph_template[:path] -%>"><br>
+    <% } -%>
+</body>
+</html>
+

@@ -10,7 +10,7 @@ module Rocuses
     set :views, '/usr/share/rocuses-ui/views'
 
     get '/' do
-      @result = "Rocuses UI\n"
+      @result = "Rocuses UI"
       manager = load_manager()
 
       @graph_template_of = manager.each
@@ -32,6 +32,22 @@ module Rocuses
 
     get '/node' do
       list_nodes()
+    end
+
+    get '/node_graph/:node' do
+      node = params[:node]
+
+      @result = node
+      manager = load_manager()
+
+      @graph_templates = manager.find_graph_template_by_nodename( node ).map { |graph_name, graph_template|
+        {
+          :name => graph_template.name,
+          :path => sprintf( "/image/%s", graph_template.name ),
+        }
+      }
+
+      erb :node_graph, :trim => '-'
     end
 
     private
@@ -106,7 +122,7 @@ module Rocuses
       manager = load_manager()
 
       @name = node
-      @graphs = manager.find_graph_template_by_nodename( node ).map { |graph_template|
+      @graphs = manager.find_graph_template_by_nodename( node ).map { |graph_name, graph_template|
         {
           :name => graph_template.name,
           :path => sprintf( "/image/%s", graph_template.name ),
