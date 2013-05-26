@@ -5,7 +5,7 @@ require 'rocuses/manager'
 
 module Rocuses
   class UI < Sinatra::Base
-    
+
     #    set :views, File.dirname(__FILE__) + '/../../views'
     set :views, '/usr/share/rocuses-ui/views'
 
@@ -19,11 +19,18 @@ module Rocuses
     end
 
     get '/image/:id/:period' do
-      display_graph_image( params )
+      node = params[:node]
+      period = parse_period( params[:period] )
+
+      display_graph_image( :id         => params[:id],
+                           :begin_time => period[:begin_time],
+                           :end_time   => period[:end_time] )
     end
 
     get '/image/:id' do
-      display_graph_image( params )
+      node = params[:node]
+
+      display_graph_image( :id         => params[:id] )
     end
 
     get '/node/:node' do
@@ -34,20 +41,19 @@ module Rocuses
       list_nodes()
     end
 
+    get '/node_graph/:node/:period' do
+      node = params[:node]
+      period = parse_period( params[:period] )
+
+      display_node_page( :node       => node,
+                         :begin_time => period[:begin_time],
+                         :end_time   => period[:end_time] )
+    end
+
     get '/node_graph/:node' do
       node = params[:node]
 
-      @result = node
-      manager = load_manager()
-
-      @graph_templates = manager.find_graph_template_by_nodename( node ).map { |graph_name, graph_template|
-        {
-          :name => graph_template.name,
-          :path => sprintf( "/image/%s", graph_template.name ),
-        }
-      }
-
-      erb :node_graph, :trim => '-'
+      display_node_page( :node => node )
     end
 
     private
@@ -58,12 +64,21 @@ module Rocuses
       return manager.graph_template_manager()
     end
 
-    def display_graph_image( params )
-      graph_name = params[:id]
-      begin_time, end_time = parse_period( params[:period] )
+    def display_graph_image( args )
+      args = Rocuses::Utils::check_args( args,
+                                         {
+                                           :id         => :req,
+                                           :begin_time => :op,
+                                           :end_time   => :op,
+                                         },
+                                         {
+                                           :begin_time => Time.now - 24 * 60 * 60,
+                                           :end_time   => Time.now,
+                                         } )
 
       begin 
         manager = load_manager()
+        graph_name = args[:id]
         graph_template = manager.get_graph_template( graph_name )
         if graph_template.nil?
           content_type 'text/plain'
@@ -76,8 +91,8 @@ module Rocuses
                                                    graph_template.nodenames.join( %q{,} ),
                                                    graph_template.filename )
 
-        return graph.make_image( :begin_time => begin_time,
-                                 :end_time   => end_time,
+        return graph.make_image( :begin_time => args[:begin_time],
+                                 :end_time   => args[:end_time],
                                  :width      => 500,
                                  :height     => 120 )
 
@@ -85,7 +100,33 @@ module Rocuses
         content_type 'text/plain'
         "Error #{ e.to_s }\n#{ e.backtrace }"
       end
+    end
 
+    def display_node_page( args )
+      args = Rocuses::Utils::check_args( args,
+                                         {
+                                           :node  => :req,
+                                           :begin_time => :op,
+                                           :end_time   => :op,
+                                         },
+                                         {
+                                           :begin_time => Time.now - 24 * 60 * 60,
+                                           :end_time   => Time.now,
+                                         } )
+      @node = args[:node]
+      manager = load_manager()
+
+      @graph_templates = manager.find_graph_template_by_nodename( args[:node] ).map { |graph_name, graph_template|
+        {
+          :name => graph_template.name,
+          :path => sprintf( "/image/%s/%s,%s",
+                            graph_template.name,
+                            args[:begin_time].to_i,
+                            args[:end_time].to_i ),
+        }
+      }
+
+      erb :node_graph, :trim => '-'
     end
 
     def parse_period( period )
@@ -109,7 +150,7 @@ module Rocuses
         end
       end
 
-      return [ begin_time, end_time ]
+      return { :begin_time => begin_time, :end_time => end_time }
     end
 
     def list_nodes
