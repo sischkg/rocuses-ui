@@ -113,16 +113,19 @@ module Rocuses
                                            :begin_time => Time.now - 24 * 60 * 60,
                                            :end_time   => Time.now,
                                          } )
-      @node = args[:node]
-      manager = load_manager()
+      @node       = args[:node]
+      @begin_time = args[:begin_time]
+      @end_time   = args[:end_time]
 
-      @graph_templates = manager.find_graph_template_by_nodename( args[:node] ).map { |graph_name, graph_template|
+      manager = load_manager()
+      @all_nodes = manager.list_nodes()
+      @graph_templates = manager.find_graph_template_by_nodename( args[:node] ).map { |graph_id, graph_template|
         {
           :name => graph_template.name,
           :path => sprintf( "/image/%s/%s,%s",
-                            graph_template.name,
-                            args[:begin_time].to_i,
-                            args[:end_time].to_i ),
+                            graph_template.graph_id,
+                            @begin_time.to_i,
+                            @end_time.to_i ),
         }
       }
 
@@ -163,10 +166,10 @@ module Rocuses
       manager = load_manager()
 
       @name = node
-      @graphs = manager.find_graph_template_by_nodename( node ).map { |graph_name, graph_template|
+      @graphs = manager.find_graph_template_by_nodename( node ).map { |graph_id, graph_template|
         {
           :name => graph_template.name,
-          :path => sprintf( "/image/%s", graph_template.name ),
+          :path => sprintf( "/image/%s", graph_template.graph_id ),
         }
       }
       erb :node, :trim => '-'      

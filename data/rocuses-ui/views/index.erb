@@ -1,15 +1,19 @@
+<!DOCTYPE html>
 <html>
 <head>
   <title><%= @result -%></title>
+  <meta charset="utf-8"/>
 </head>
 <body>
-  <table>
-    <% @graph_template_of.each { |graph_template| -%>
-    <tr>
-      <td> <%= graph_template.name -%> </td><td> <img src="/image/<%= graph_template.name -%>"></td>
-    </tr>
-    <% } -%>
-  </table>
+  <header>
+  </header>
+  <h1> <%= @result -%> status </h1>
+  <nav>
+
+  </nav>
+  <% @graph_template_of.each { |graph_template| -%>
+  <%=   graph_template.name -%><img src="/image/<%= graph_template.name -%>">
+  <% } -%>
 </body>
 </html>
 

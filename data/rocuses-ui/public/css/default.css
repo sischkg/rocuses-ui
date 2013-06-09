@@ -1,0 +1,17 @@
+
+body { width: 600px }
+h1#header_title { font-size: medium }
+
+nav#node_nav { float: left  }
+h1#node_nav_title { font-size: small }
+a#node_nav_link { font-size: small }
+li#node_nav_link {}
+
+nav#period_nav {  }
+h1#period_nav_title { font-size: small }
+a#period_nav_link { font-size: small }
+li#period_nav_link {}
+
+section#node_section { float: right }
+section#graph_section { width: 300px }
+

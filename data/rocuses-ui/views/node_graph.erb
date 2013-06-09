@@ -1,17 +1,38 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title><%= @node -%></title>
+	<meta charset="utf-8"/>
+	<link rel="stylesheet" href="/css/default.css"/>
   </head>
   <body>
-    <header>
-      <a href="/node_graph/<%= @node -%>/<%= Time.now.to_i -       24 * 60 * 60 -%>,<%= Time.now.to_i -%>">daily</a> 
-      <a href="/node_graph/<%= @node -%>/<%= Time.now.to_i -   7 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">weekly</a> 
-      <a href="/node_graph/<%= @node -%>/<%= Time.now.to_i -  31 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">monthly</a> 
-      <a href="/node_graph/<%= @node -%>/<%= Time.now.to_i - 365 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">yearly</a> 
-    </header>
-    <% @graph_templates.each { |graph_template| -%>
-	  <img src="<%= graph_template[:path] -%>"/><br>
-    <% } -%>
-</body>
+	<header>
+	  <h1 id="header_title">Node Graph <%= @node -%> </h1>
+	</header>
+	<nav id="node_nav">
+	  <h1 id="node_nav_title">All nodes</h1>
+	  <ul>
+		<% @all_nodes.each { |node| -%>
+		<li id="node_nav_link"><a id="node_nav_link" href="/node_graph/<%= node -%>/<%= @begin_time.to_i -%>,<%= @end_time.to_i -%>"><%= node -%></a> </li>
+		<% } -%>
+	  </ul>
+    </nav>
+	<section id="node_section">
+      <nav id="period_nav">
+		<h1 id="period_nav_title">Graph Period</h1>
+		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i -       24 * 60 * 60 -%>,<%= Time.now.to_i -%>">daily</a>
+		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i -   7 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">weekly</a>
+		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i -  31 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">monthly</a>
+		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i - 365 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">yearly</a>
+      </nav>
+	  <section id="graph_section">
+		<% @graph_templates.each { |graph_template| -%>
+		<img src="<%= graph_template[:path] -%>"/>
+		<% } -%>
+	  </section>
+	</section>
+	<footer>
+	</footer>
+  </body>
 </html>
 
