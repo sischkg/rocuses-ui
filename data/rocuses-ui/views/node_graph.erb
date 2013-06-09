@@ -26,8 +26,13 @@
 		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i - 365 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">yearly</a>
       </nav>
 	  <section id="graph_section">
-		<% @graph_templates.each { |graph_template| -%>
-		<img src="<%= graph_template[:path] -%>"/>
+		<% @graph_template_paths_of.keys.sort.each { |category| -%>
+		<section id="section_graph_template">
+		  <h1 id="section_graph_template"><%= category -%></h1>
+		  <% @graph_template_paths_of[category].sort.each { |graph_template_path| -%>
+		  <img src="<%= graph_template_path -%>"/>
+		  <% } -%>
+		</section>
 		<% } -%>
 	  </section>
 	</section>

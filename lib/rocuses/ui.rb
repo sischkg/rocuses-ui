@@ -119,14 +119,12 @@ module Rocuses
 
       manager = load_manager()
       @all_nodes = manager.list_nodes()
-      @graph_templates = manager.find_graph_template_by_nodename( args[:node] ).map { |graph_id, graph_template|
-        {
-          :name => graph_template.name,
-          :path => sprintf( "/image/%s/%s,%s",
-                            graph_template.graph_id,
-                            @begin_time.to_i,
-                            @end_time.to_i ),
-        }
+      
+      @graph_template_paths_of = Hash.new { |hash,key|
+        hash[key] = Array.new
+      }
+      manager.find_graph_template_by_nodename( args[:node] ).each { |graph_id, graph_template|
+        @graph_template_paths_of[graph_template.category] << graph_path( graph_template, @begin_time, @end_time )
       }
 
       erb :node_graph, :trim => '-'
@@ -173,6 +171,10 @@ module Rocuses
         }
       }
       erb :node, :trim => '-'      
+    end
+
+    def graph_path( graph_template, begin_time = Time.now - 24 * 60 * 60, end_time = Time.now )
+      return sprintf( "/image/%s/%d,%d", graph_template.graph_id, begin_time.to_i, end_time.to_i )
     end
 
   end
