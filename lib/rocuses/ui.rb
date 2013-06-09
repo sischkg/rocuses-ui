@@ -10,10 +10,9 @@ module Rocuses
     set :views, '/usr/share/rocuses-ui/views'
 
     get '/' do
-      @result = "Rocuses UI"
       manager = load_manager()
 
-      @graph_template_of = manager.each
+      @all_nodes = manager.list_nodes()
 
       erb :index, :trim => '-'
     end

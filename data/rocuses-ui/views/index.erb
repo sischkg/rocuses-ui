@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title><%= @result -%></title>
-  <meta charset="utf-8"/>
-</head>
-<body>
-  <header>
-  </header>
-  <h1> <%= @result -%> status </h1>
-  <nav>
-
-  </nav>
-  <% @graph_template_of.each { |graph_template| -%>
-  <%=   graph_template.name -%><img src="/image/<%= graph_template.name -%>">
-  <% } -%>
-</body>
+  <head>
+    <title>Rocuses - nodes -</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="/css/default.css"/>
+  </head>
+  <body>
+    <header>
+      <h1> Rocuses - nodes - </h1>
+    </header>
+    <nav id="node_nav">
+	  <h1 id="node_nav_title">All nodes</h1>
+	  <ul>
+	    <% @all_nodes.each { |node| -%>
+	    <li id="node_nav_link"><a id="node_nav_link" href="/node_graph/<%= node -%>"><%= node -%></a> </li>
+	    <% } -%>
+	  </ul>
+    </nav>
+  </body>
 </html>
 
