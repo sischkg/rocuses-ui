@@ -7,35 +7,63 @@
   </head>
   <body>
 	<header>
-	  <h1 id="header_title">Node Graph <%= @node -%> </h1>
+	  <h1 class="header_title">Node <%= @node -%> Graph  </h1>
 	</header>
-	<nav id="node_nav">
-	  <h1 id="node_nav_title">All nodes</h1>
-	  <ul>
-		<% @all_nodes.each { |node| -%>
-		<li id="node_nav_link"><a id="node_nav_link" href="/node_graph/<%= node -%>/<%= @begin_time.to_i -%>,<%= @end_time.to_i -%>"><%= node -%></a> </li>
-		<% } -%>
-	  </ul>
-    </nav>
-	<section id="node_section">
-      <nav id="period_nav">
-		<h1 id="period_nav_title">Graph Period</h1>
-		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i -       24 * 60 * 60 -%>,<%= Time.now.to_i -%>">daily</a>
-		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i -   7 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">weekly</a>
-		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i -  31 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">monthly</a>
-		<a id="period_nav_link" href="/node_graph/<%= @node -%>/<%= Time.now.to_i - 365 * 24 * 60 * 60 -%>,<%= Time.now.to_i -%>">yearly</a>
-      </nav>
-	  <section id="graph_section">
-		<% @graph_template_paths_of.keys.sort.each { |category| -%>
-		<section id="section_graph_template">
-		  <h1 id="section_graph_template"><%= category -%></h1>
-		  <% @graph_template_paths_of[category].sort.each { |graph_template_path| -%>
-		  <img src="<%= graph_template_path -%>"/>
+	<div class="contents">
+	  <div class="nav">
+		<nav class="node_nav">
+		  <h1 class="node_nav_title">All nodes</h1>
+		  <ul>
+			<% @all_nodes.each { |node| -%>
+			<li class="node_nav_link"><a class="node_nav_link" href="/node_graph/<%= node -%>/<%= @begin_time.to_i -%>,<%= @end_time.to_i -%>"><%= node -%></a> </li>
+			<% } -%>
+		  </ul>
+		</nav>
+
+		<nav class="category_nav">
+		  <h1 class="node_nav_title">All Category</h1>
+		  <ul>
+			<% @graph_template_paths_of.keys.sort.each { |category| -%>
+			<li class="category_nav_link">
+			  <a href="#section_category_<%= Rocuses::UI::escape_category( category )-%>" class="category_nav_link"><%= category -%></a>
+			</li>
+			<% } -%>
+		  </ul>
+		</nav>
+	  </div>
+	  <div class="graph">
+		<nav class="period_nav">
+		  <h1 class="period_nav_title">Graph Period</h1>
+		  <div class="fixed_period">
+			<ul class="period_nav_link">
+			  <li class="period_nav_link"><a class="period_nav_link" href="/node_graph/<%= @node -%>/daily">daily</a></li>
+			  <li class="period_nav_link"><a class="period_nav_link" href="/node_graph/<%= @node -%>/weekly">weekly</a></li>
+			  <li class="period_nav_link"><a class="period_nav_link" href="/node_graph/<%= @node -%>/monthly">monthly</a></li>
+			  <li class="period_nav_link"><a class="period_nav_link" href="/node_graph/<%= @node -%>/yearly">yearly</a></li>
+			</ul>
+		  </div>
+          <div class="dynamic_period" >
+		  <form action="/node_graph/<%= @node -%>" method="GET">
+			begin: <input type="text" name="begin_time" value="<%= @begin_time.strftime( "%Y-%m-%d %H:%M" ) -%>"/>
+			end:   <input type="text" name="end_time"  value="<%= @end_time.strftime( "%Y-%m-%d %H:%M" ) -%>"/>
+			<input type="submit"/>
+		  </form>
+          </div>
+		</nav>
+		<section class="graph_section">
+		  <% @graph_template_paths_of.keys.sort.each { |category| -%>
+		  <section class="section_graph_template">
+			<h1 id="section_category_<%= Rocuses::UI::escape_category( category )-%>" class="section_graph_template"><%= category -%></h1>
+			<ul>
+			  <% @graph_template_paths_of[category].sort.each { |graph_template_path| -%>
+			  <li class="graph_list_item"><img class="graph_image" src="<%= graph_template_path -%>"/></li>
+			  <% } -%>
+			</ul>
+		  </section>
 		  <% } -%>
 		</section>
-		<% } -%>
-	  </section>
-	</section>
+	  </div>
+	</div>
 	<footer>
 	</footer>
   </body>

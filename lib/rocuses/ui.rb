@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+require 'time'
 require 'sinatra/base'
 require 'rocuses/manager'
 
@@ -49,10 +50,19 @@ module Rocuses
                          :end_time   => period[:end_time] )
     end
 
-    get '/node_graph/:node' do
+    get '/node_graph/:node/?' do
       node = params[:node]
+      if params[:begin_time] && params[:end_time]
+        display_node_page( :node       => node,
+                           :begin_time => parse_time_string( params[:begin_time], Time.now - 24 * 60 * 60 ),
+                           :end_time   => parse_time_string( params[:end_time], Time.now - 24 * 60 * 60 ) )
+      else
+        display_node_page( :node => node )
+      end
+    end
 
-      display_node_page( :node => node )
+    def self.escape_category( category )
+      return category.gsub( %r{[ /]}, %q{_} )
     end
 
     private
@@ -133,24 +143,39 @@ module Rocuses
       end_time   = Time.now
       begin_time = end_time - 24 * 60 * 60
       if period
-        if period =~ /\A(\d+),(\d+)\z/
-          begin_time = Time.at( $1.to_i )
-          end_time   = Time.at( $2.to_i )
+        if period =~ /\A([\d \-\/:]+),([\d \-\/:]+)\z/
+          begin_time = parse_time_string( $1, begin_time )
+          end_time   = parse_time_string( $2, end_time )
+          if begin_time > end_time
+            begin_time, end_time = end_time, begin_time
+          end
         else 
           case period
-          when 'daily'
-            begin_time = end_time - 24 * 60 * 60
-          when 'weekly'
-            begin_time = end_time - 24 * 60 * 60 * 7
-          when 'monthly'
-            begin_time = end_time - 24 * 60 * 60 * 31
           when 'yearly'
             begin_time = end_time - 24 * 60 * 60 * 365
+          when 'monthly'
+            begin_time = end_time - 24 * 60 * 60 * 31
+          when 'weekly'
+            begin_time = end_time - 24 * 60 * 60 * 7
+          else
+            begin_time = end_time - 24 * 60 * 60
           end
         end
       end
 
       return { :begin_time => begin_time, :end_time => end_time }
+    end
+
+    def parse_time_string( time_str, default_time )
+      if time_str =~ /\A\d+\z/
+        return Time.at( time_str.to_i )
+      else
+        begin
+          return Time.parse( time_str )
+        rescue ArgumentError => e
+          return default_time
+        end
+      end
     end
 
     def list_nodes
